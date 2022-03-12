@@ -2,7 +2,7 @@
 The codec for GoLang.
 <br><br>
 
-# Support：
+# support
 ✅ &nbsp;json
 <br>
 ✅ &nbsp;xml
