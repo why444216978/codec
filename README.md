@@ -9,9 +9,9 @@ The codec for GoLang.
 <br>
 ✅ &nbsp;form
 <br>
-❌ &nbsp;protobuf
+✅ &nbsp;protobuf
 <br>
-❌ &nbsp;toml
+✅ &nbsp;toml
 <br>
-❌ &nbsp;yaml
+✅ &nbsp;yaml
 <br>
