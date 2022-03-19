@@ -45,5 +45,11 @@ func TestTomlCodec_Decode(t *testing.T) {
 			assert.Equal(t, err.Error(), "toml: cannot decode to type int")
 			assert.Equal(t, data, 0)
 		})
+		convey.Convey("reader is nil", func() {
+			data := map[string]string{}
+			err := codec.Decode(nil, &data)
+
+			assert.Equal(t, err.Error(), "reader is nil")
+		})
 	})
 }

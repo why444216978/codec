@@ -2,8 +2,11 @@ package json
 
 import (
 	"bytes"
-	"encoding/json"
+	"errors"
 	"io"
+
+	json "github.com/json-iterator/go"
+	"github.com/valyala/bytebufferpool"
 
 	"github.com/why444216978/codec"
 )
@@ -13,13 +16,24 @@ type JSONCodec struct{}
 var _ codec.Codec = (*JSONCodec)(nil)
 
 func (c JSONCodec) Encode(data interface{}) (io.Reader, error) {
-	buf := bytes.NewBuffer([]byte{})
-	if err := json.NewEncoder(buf).Encode(data); err != nil {
+	b, err := json.Marshal(data)
+	if err != nil {
 		return nil, err
 	}
-	return buf, nil
+
+	return bytes.NewBuffer(b), nil
 }
 
 func (c JSONCodec) Decode(r io.Reader, dst interface{}) error {
-	return json.NewDecoder(r).Decode(dst)
+	if r == nil {
+		return errors.New("reader is nil")
+	}
+
+	buf := bytebufferpool.Get()
+	defer bytebufferpool.Put(buf)
+	if _, err := buf.ReadFrom(r); err != nil {
+		return err
+	}
+
+	return json.Unmarshal(buf.Bytes(), dst)
 }

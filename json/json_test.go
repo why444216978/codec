@@ -19,7 +19,7 @@ func TestJSONCodec_Encode(t *testing.T) {
 
 			b, err := ioutil.ReadAll(r)
 			assert.Equal(t, err, nil)
-			assert.Equal(t, b, []byte{123, 34, 97, 34, 58, 34, 97, 34, 125, 10})
+			assert.Equal(t, b, []byte{123, 34, 97, 34, 58, 34, 97, 34, 125})
 		})
 	})
 }
@@ -42,8 +42,16 @@ func TestJSONCodec_Decode(t *testing.T) {
 			}
 			data := &Data{}
 			err := codec.Decode(bytes.NewReader([]byte(`{"a":"a"}`)), data)
-			assert.Equal(t, err.Error(), "json: cannot unmarshal string into Go struct field Data.a of type int")
+			assert.Equal(t, err != nil, true)
 			assert.Equal(t, data.A, 0)
+		})
+		convey.Convey("reader is nil", func() {
+			type Data struct {
+				A int `json:"a"`
+			}
+			data := &Data{}
+			err := codec.Decode(nil, data)
+			assert.Equal(t, err.Error(), "reader is nil")
 		})
 	})
 }

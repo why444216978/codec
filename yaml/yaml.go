@@ -3,9 +3,9 @@ package yaml
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
 
 	"github.com/pkg/errors"
+	"github.com/valyala/bytebufferpool"
 	"gopkg.in/yaml.v2"
 
 	"github.com/why444216978/codec"
@@ -20,6 +20,7 @@ func (c YamlCodec) Encode(data interface{}) (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return bytes.NewBuffer(b), nil
 }
 
@@ -28,10 +29,11 @@ func (c YamlCodec) Decode(r io.Reader, dst interface{}) error {
 		return errors.New("reader is nil")
 	}
 
-	b, err := ioutil.ReadAll(r)
-	if err != nil {
+	buf := bytebufferpool.Get()
+	defer bytebufferpool.Put(buf)
+	if _, err := buf.ReadFrom(r); err != nil {
 		return err
 	}
 
-	return yaml.Unmarshal(b, dst)
+	return yaml.Unmarshal(buf.Bytes(), dst)
 }

@@ -3,9 +3,10 @@ package xml
 import (
 	"bytes"
 	"encoding/xml"
+	"errors"
 	"io"
-	"io/ioutil"
 
+	"github.com/valyala/bytebufferpool"
 	"github.com/why444216978/codec"
 )
 
@@ -23,10 +24,15 @@ func (c XMLCodec) Encode(data interface{}) (io.Reader, error) {
 }
 
 func (c XMLCodec) Decode(r io.Reader, dst interface{}) error {
-	b, err := ioutil.ReadAll(r)
-	if err != nil {
+	if r == nil {
+		return errors.New("reader is nil")
+	}
+
+	buf := bytebufferpool.Get()
+	defer bytebufferpool.Put(buf)
+	if _, err := buf.ReadFrom(r); err != nil {
 		return err
 	}
 
-	return xml.Unmarshal(b, dst)
+	return xml.Unmarshal(buf.Bytes(), dst)
 }

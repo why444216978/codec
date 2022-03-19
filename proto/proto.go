@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
+	"github.com/valyala/bytebufferpool"
 
 	"github.com/why444216978/codec"
 )
@@ -28,17 +29,19 @@ func (c ProtoCodec) Encode(data interface{}) (io.Reader, error) {
 }
 
 func (c ProtoCodec) Decode(r io.Reader, dst interface{}) error {
+	if r == nil {
+		return errors.New("reader is nil")
+	}
+
 	if _, ok := dst.(proto.Message); !ok {
 		return errors.New("dst assert to proto.Message fail")
 	}
 
-	if buf, ok := r.(*bytes.Buffer); ok {
-		return proto.Unmarshal(buf.Bytes(), dst.(proto.Message))
-	}
-
-	buf := bytes.NewBuffer([]byte{})
+	buf := bytebufferpool.Get()
+	defer bytebufferpool.Put(buf)
 	if _, err := buf.ReadFrom(r); err != nil {
 		return err
 	}
+
 	return proto.Unmarshal(buf.Bytes(), dst.(proto.Message))
 }

@@ -40,13 +40,7 @@ func TestProtoCodec_Encode(t *testing.T) {
 func TestProtoCodec_Decode(t *testing.T) {
 	codec := ProtoCodec{}
 	convey.Convey("TestProtoCodec_Decode", t, func() {
-		convey.Convey("success *bytes.Buffer", func() {
-			msg := &message{}
-			err := codec.Decode(bytes.NewBuffer([]byte{10, 8, 112, 114, 111, 116, 111, 98, 117, 102}), msg)
-			assert.Equal(t, err, nil)
-			assert.Equal(t, *msg.Message, "protobuf")
-		})
-		convey.Convey("success not *bytes.Buffer", func() {
+		convey.Convey("success", func() {
 			msg := &message{}
 			err := codec.Decode(bytes.NewReader([]byte{10, 8, 112, 114, 111, 116, 111, 98, 117, 102}), msg)
 			assert.Equal(t, err, nil)
@@ -55,6 +49,10 @@ func TestProtoCodec_Decode(t *testing.T) {
 		convey.Convey("data not proto.Message", func() {
 			err := codec.Decode(bytes.NewBuffer([]byte{10, 8, 112, 114, 111, 116, 111, 98, 117, 102}), nil)
 			assert.Equal(t, err.Error(), "dst assert to proto.Message fail")
+		})
+		convey.Convey("reader is nil", func() {
+			err := codec.Decode(nil, nil)
+			assert.Equal(t, err.Error(), "reader is nil")
 		})
 	})
 }

@@ -133,5 +133,10 @@ func TestXMLCodec_Decode(t *testing.T) {
 			assert.Equal(t, err, nil)
 			assert.Equal(t, dst, res)
 		})
+		convey.Convey("reader is nil", func() {
+			dst := &Books{}
+			err := codec.Decode(nil, dst)
+			assert.Equal(t, err.Error(), "reader is nil")
+		})
 	})
 }
